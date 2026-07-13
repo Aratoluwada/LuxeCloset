@@ -1,0 +1,14 @@
+{
+  "name": "LuxeCloset",
+  "description": "An AI-powered wardrobe assistant that organizes your clothes, tracks laundry, and suggests perfect outfits for your calendar events.",
+  "requestFramePermissions": [
+    "camera",
+    "geolocation"
+  ],
+  "majorCapabilities": [
+    "AI-powered clothing categorization",
+    "Smart outfit suggestions based on weather and events",
+    "Laundry status tracking",
+    "Drag-and-drop outfit planning"
+  ]
+}

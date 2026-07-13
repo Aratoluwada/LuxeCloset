@@ -1,0 +1,64 @@
+rules_version = '2';
+service cloud.firestore {
+  match /databases/{database}/documents {
+    // Default deny
+    match /{document=**} {
+      allow read, write: if false;
+    }
+
+    // Common helpers
+    function isSignedIn() { return request.auth != null; }
+    function isOwner(userId) { return isSignedIn() && request.auth.uid == userId; }
+    function isValidId(id) { return id is string && id.size() <= 128 && id.matches('^[a-zA-Z0-9_\\-]+$'); }
+    function incoming() { return request.resource.data; }
+    function existing() { return resource.data; }
+
+    function isValidClothingItem(data) {
+      return data.keys().hasAll(['name', 'category', 'imageUrl', 'userId', 'isDirty']) &&
+             data.name is string && data.name.size() > 0 && data.name.size() < 200 &&
+             data.category in ['top', 'bottom', 'shoes', 'outerwear', 'accessory'] &&
+             data.imageUrl is string && data.imageUrl.size() < 1000000 &&
+             data.userId == request.auth.uid &&
+             data.isDirty is bool;
+    }
+
+    function isValidEvent(data) {
+      return data.keys().hasAll(['title', 'date', 'type', 'formality', 'userId']) &&
+             data.title is string && data.title.size() > 0 && data.title.size() < 200 &&
+             data.date is string &&
+             data.type in ['work', 'casual', 'formal', 'sport', 'party'] &&
+             data.formality in ['casual', 'smart-casual', 'business', 'formal'] &&
+             data.userId == request.auth.uid;
+    }
+
+    function isValidOutfit(data) {
+      return data.keys().hasAll(['date', 'itemIds', 'userId']) &&
+             data.date is string &&
+             data.itemIds is list && data.itemIds.size() <= 10 &&
+             data.userId == request.auth.uid;
+    }
+
+    match /clothingItems/{itemId} {
+      allow create: if isSignedIn() && isValidClothingItem(incoming());
+      allow get, list: if isOwner(existing().userId);
+      allow update: if isOwner(existing().userId) && isValidClothingItem(incoming()) && (
+        incoming().diff(existing()).affectedKeys().hasOnly(['isDirty', 'name', 'category', 'color', 'season', 'imageUrl'])
+      );
+      allow delete: if isOwner(existing().userId);
+    }
+
+    match /events/{eventId} {
+      allow create: if isSignedIn() && isValidEvent(incoming());
+      allow get, list: if isOwner(existing().userId);
+      allow update: if isOwner(existing().userId) && isValidEvent(incoming());
+      allow delete: if isOwner(existing().userId);
+    }
+
+    match /outfits/{outfitId} {
+      allow create: if isSignedIn() && isValidOutfit(incoming());
+      allow get, list: if isOwner(existing().userId);
+      allow update: if isOwner(existing().userId) && isValidOutfit(incoming());
+      allow delete: if isOwner(existing().userId);
+    }
+  }
+}

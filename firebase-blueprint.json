@@ -1,0 +1,64 @@
+{
+  "entities": {
+    "ClothingItem": {
+      "title": "Clothing Item",
+      "description": "Represents a piece of clothing in the digital closet.",
+      "type": "object",
+      "properties": {
+        "id": { "type": "string" },
+        "name": { "type": "string" },
+        "category": { "type": "string", "enum": ["top", "bottom", "shoes", "outerwear", "accessory"] },
+        "color": { "type": "string" },
+        "season": { "type": "string", "enum": ["spring", "summer", "fall", "winter", "all"] },
+        "imageUrl": { "type": "string", "format": "uri" },
+        "isDirty": { "type": "boolean" },
+        "userId": { "type": "string" },
+        "createdAt": { "type": "string", "format": "date-time" }
+      },
+      "required": ["name", "category", "imageUrl", "userId", "isDirty"]
+    },
+    "Event": {
+      "title": "Calendar Event",
+      "description": "An event the user is attending that influences outfit choice.",
+      "type": "object",
+      "properties": {
+        "id": { "type": "string" },
+        "title": { "type": "string" },
+        "date": { "type": "string", "format": "date" },
+        "type": { "type": "string", "enum": ["work", "casual", "formal", "sport", "party"] },
+        "formality": { "type": "string", "enum": ["casual", "smart-casual", "business", "formal"] },
+        "userId": { "type": "string" }
+      },
+      "required": ["title", "date", "type", "formality", "userId"]
+    },
+    "Outfit": {
+      "title": "Daily Outfit",
+      "description": "The selected clothing items for a specific day.",
+      "type": "object",
+      "properties": {
+        "id": { "type": "string" },
+        "date": { "type": "string", "format": "date" },
+        "itemIds": { "type": "array", "items": { "type": "string" } },
+        "userId": { "type": "string" },
+        "rating": { "type": "number" },
+        "feedback": { "type": "string" },
+        "createdAt": { "type": "string", "format": "date-time" }
+      },
+      "required": ["date", "itemIds", "userId"]
+    }
+  },
+  "firestore": {
+    "clothingItems": {
+      "schema": "ClothingItem",
+      "description": "User's wardrobe collection."
+    },
+    "events": {
+      "schema": "Event",
+      "description": "User's calendar events."
+    },
+    "outfits": {
+      "schema": "Outfit",
+      "description": "Planned outfits for the week."
+    }
+  }
+}
