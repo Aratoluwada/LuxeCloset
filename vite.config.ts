@@ -22,3 +22,7 @@ export default defineConfig(({mode}) => {
     },
   };
 });
+export default defineConfig({
+  base: '/repo-name/',
+  // ...rest of your existing config
+})
